@@ -171,12 +171,12 @@
     </div>
 
     <div class="input-group">
-        <label>Lote (6 dígitos)</label>
-        <input type="text" id="campoLote3" maxlength="6" oninput="formatarPostura()">
+        <label>Lote (formato Lxx.xx)</label>
+        <input type="text" id="campoLote3" maxlength="6" oninput="formatarLote()">
     </div>
 
     <div class="input-group">
-        <label>Data de Postura (8 dígitos)</label>
+        <label>Data de Postura (formato .xx.xx.xx)</label>
         <input type="text" id="campoLote10" maxlength="9" oninput="formatarPostura()">
     </div>
 
@@ -216,29 +216,41 @@
 <button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
+function formatarLote() {
+    let v = campoLote3.value.replace(/\W/g, "");
+    v = v.substring(0, 5); // L + 4 dígitos
 
-function formatarPostura() {
-    let valor = campoLote10.value.replace(/\D/g, "");
-    valor = valor.substring(0, 8);
-    campoLote10.value = "." + valor;
-    montarLoteCompleto(valor);
+    if (!v.startsWith("L")) v = "L" + v;
+
+    let bloco1 = v.substring(0,3); // L21
+    let bloco2 = v.substring(3,5); // 15
+
+    campoLote3.value = bloco1 + "." + bloco2;
+
+    montarLoteCompleto();
 }
 
-function montarLoteCompleto(posturaLimpa) {
-    let lote = campoLote3.value;
+function formatarPostura() {
+    let v = campoLote10.value.replace(/\D/g, "");
+    v = v.substring(0, 6); // 3 blocos de 2
 
-    if (lote.length === 6 && posturaLimpa.length === 8) {
+    let formatado = ".";
 
-        let l1 = lote.substring(0,2);
-        let l2 = lote.substring(2,4);
-        let l3 = lote.substring(4,6);
+    if (v.length > 0) formatado += v.substring(0,2);
+    if (v.length > 2) formatado += "." + v.substring(2,4);
+    if (v.length > 4) formatado += "." + v.substring(4,6);
 
-        let p1 = posturaLimpa.substring(0,2);
-        let p2 = posturaLimpa.substring(2,4);
-        let p3 = posturaLimpa.substring(4,6);
-        let p4 = posturaLimpa.substring(6,8);
+    campoLote10.value = formatado;
 
-        campoLote.value = `${l1}.${l2}.${l3}.${p1}.${p2}.${p3}.${p4}`;
+    montarLoteCompleto();
+}
+
+function montarLoteCompleto() {
+    let lote = campoLote3.value;      // L21.15
+    let postura = campoLote10.value;  // .19.06.26
+
+    if (lote.length === 6 && postura.length === 9) {
+        campoLote.value = lote + postura; // L21.15.19.06.26
     } else {
         campoLote.value = "";
     }
@@ -271,7 +283,7 @@ function salvarEntrada() {
     let palete = campoPalete.value;
     let loteCompleto = campoLote.value;
     let lote = campoLote3.value;
-    let postura = campoLote10.value.replace(".", "");
+    let postura = campoLote10.value;
     let caixas = campoCaixas.value;
 
     if (!dataISO || !sku || !palete || !loteCompleto || !caixas) {
@@ -323,7 +335,7 @@ function editarLinha(botao) {
 
     campoLote.value = linha.cells[3].innerText;
     campoLote3.value = linha.cells[4].innerText;
-    campoLote10.value = "." + linha.cells[5].innerText;
+    campoLote10.value = linha.cells[5].innerText;
 
     campoCaixas.value = linha.cells[6].innerText;
 }
@@ -388,9 +400,7 @@ async function gerarExcel() {
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
 }
-
 </script>
 
 </body>
 </html>
-
