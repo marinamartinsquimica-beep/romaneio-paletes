@@ -187,6 +187,7 @@
 
     <button class="btn-primary" onclick="salvarEntrada()">Salvar Entrada</button>
     <button class="btn-blue" onclick="gerarExcel()">Gerar Excel e Salvar</button>
+    <button class="btn-blue" onclick="compartilharWhatsApp()">Compartilhar Excel no WhatsApp</button>
 </div>
 
 <div class="table-container">
@@ -212,6 +213,7 @@
 <script>
 let indiceEditando = null;
 let ordemAsc = true;
+let ultimoExcelGerado = null;
 
 function formatarDataBR(dataISO) {
     const partes = dataISO.split("-");
@@ -352,7 +354,24 @@ async function gerarExcel() {
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
 
+    window.ultimoExcelGerado = arquivo; // <-- necessário para WhatsApp
+
     alert("Arquivo Excel gerado e salvo com sucesso.");
+}
+
+function compartilharWhatsApp() {
+    if (!window.ultimoExcelGerado) {
+        alert("Gere o Excel antes de compartilhar.");
+        return;
+    }
+
+    const arquivo = window.ultimoExcelGerado;
+    const urlArquivo = URL.createObjectURL(arquivo);
+
+    const mensagem = "Segue o arquivo de romaneio:";
+    const linkWhatsApp = `https://wa.me/?text=${encodeURIComponent(mensagem + " " + urlArquivo)}`;
+
+    window.open(linkWhatsApp, "_blank");
 }
 
 if ("serviceWorker" in navigator) {
