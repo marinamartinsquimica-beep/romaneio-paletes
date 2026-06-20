@@ -177,7 +177,7 @@
     </div>
 
     <div class="input-group">
-        <label>Data de Postura (11 dígitos)</label>
+        <label>Data de Postura (8 últimos dígitos)</label>
         <input type="text" id="campoLote10" disabled>
     </div>
 
@@ -222,7 +222,7 @@ function formatarDataBR(dataISO) {
 function extrairLote() {
     let lote = campoLote.value;
     campoLote3.value = lote.substring(0, 3);
-    campoLote10.value = lote.slice(-11);
+    campoLote10.value = lote.slice(-8); // AJUSTE FEITO AQUI
 }
 
 function limparCampos() {
@@ -363,10 +363,3 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
-
-
-
-
-
-
-
