@@ -11,7 +11,6 @@
 
 <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 
-<!-- Ícone do app -->
 <link rel="icon" href="icon-192.png">
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -77,6 +76,10 @@
         color: var(--text);
         font-size: 18px;
         height: 52px;
+    }
+
+    input[disabled] {
+        opacity: 0.6;
     }
 
     button {
@@ -151,6 +154,22 @@
 <h2>📦 Romaneio Paletes</h2>
 
 <div class="card">
+
+    <div class="input-group">
+        <label>Lote (3 dígitos)</label>
+        <input type="text" id="campoLote3" maxlength="3" oninput="montarLoteCompleto()">
+    </div>
+
+    <div class="input-group">
+        <label>Data de Postura (8 dígitos)</label>
+        <input type="text" id="campoLote10" maxlength="8" oninput="montarLoteCompleto()">
+    </div>
+
+    <div class="input-group">
+        <label>Lote Completo</label>
+        <input type="text" id="campoLote" disabled>
+    </div>
+
     <div class="input-group">
         <label>Data</label>
         <input type="date" id="campoData">
@@ -167,27 +186,13 @@
     </div>
 
     <div class="input-group">
-        <label>Lote Completo</label>
-        <input type="text" id="campoLote" oninput="extrairLote()">
-    </div>
-
-    <div class="input-group">
-        <label>Lote</label>
-        <input type="text" id="campoLote3" disabled>
-    </div>
-
-    <div class="input-group">
-        <label>Data de Postura (8 últimos dígitos)</label>
-        <input type="text" id="campoLote10" disabled>
-    </div>
-
-    <div class="input-group">
         <label>Caixas</label>
         <input type="number" id="campoCaixas">
     </div>
 
     <button class="btn-primary" onclick="salvarEntrada()">Salvar Entrada</button>
     <button class="btn-blue" onclick="gerarExcel()">Gerar Excel e Salvar</button>
+
 </div>
 
 <div class="table-container">
@@ -211,18 +216,29 @@
 <button class="fab" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 
 <script>
+
+function montarLoteCompleto() {
+    let lote = campoLote3.value;
+    let postura = campoLote10.value;
+
+    if (lote.length === 3 && postura.length === 8) {
+        campoLote.value =
+            lote + "." +
+            postura.substring(0,2) + "." +
+            postura.substring(2,4) + "." +
+            postura.substring(4,6) + "." +
+            postura.substring(6,8);
+    } else {
+        campoLote.value = "";
+    }
+}
+
 let indiceEditando = null;
 let ordemAsc = true;
 
 function formatarDataBR(dataISO) {
     const partes = dataISO.split("-");
     return `${partes[2]}/${partes[1]}/${partes[0]}`;
-}
-
-function extrairLote() {
-    let lote = campoLote.value;
-    campoLote3.value = lote.substring(0, 3);
-    campoLote10.value = lote.slice(-8); // AJUSTE FEITO AQUI
 }
 
 function limparCampos() {
@@ -293,9 +309,11 @@ function editarLinha(botao) {
 
     campoSku.value = linha.cells[1].innerText;
     campoPalete.value = linha.cells[2].innerText;
+
     campoLote.value = linha.cells[3].innerText;
     campoLote3.value = linha.cells[4].innerText;
     campoLote10.value = linha.cells[5].innerText;
+
     campoCaixas.value = linha.cells[6].innerText;
 }
 
@@ -359,6 +377,7 @@ async function gerarExcel() {
 if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("service-worker.js");
 }
+
 </script>
 
 </body>
