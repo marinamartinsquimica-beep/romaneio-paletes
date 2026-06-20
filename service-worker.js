@@ -1,4 +1,4 @@
-const CACHE_NAME = "romaneio-cache-v4";
+const CACHE_NAME = "romaneio-cache-v5";
 
 const FILES_TO_CACHE = [
   "./",
@@ -8,7 +8,7 @@ const FILES_TO_CACHE = [
   "./icon-512.png"
 ];
 
-// Instalação — cria o cache inicial
+// Instalação
 self.addEventListener("install", event => {
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
@@ -26,7 +26,7 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// Fetch — funciona offline
+// Fetch — modo offline
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(resp => {
