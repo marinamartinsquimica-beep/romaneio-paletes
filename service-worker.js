@@ -1,4 +1,4 @@
-const CACHE_NAME = "romaneio-cache-v7";
+const CACHE_NAME = "romaneio-cache-v9";
 
 const FILES_TO_CACHE = [
   "./",
@@ -16,7 +16,7 @@ self.addEventListener("install", event => {
   self.skipWaiting();
 });
 
-// Ativação — remove versões antigas
+// Ativação — remove caches antigos
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -28,7 +28,7 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// Fetch — funciona offline
+// Fetch — modo offline
 self.addEventListener("fetch", event => {
   event.respondWith(
     caches.match(event.request).then(resp => {
