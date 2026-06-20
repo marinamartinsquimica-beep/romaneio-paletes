@@ -192,6 +192,7 @@
 
     <button class="btn-primary" onclick="salvarEntrada()">Salvar Entrada</button>
     <button class="btn-blue" onclick="gerarExcel()">Gerar Excel e Salvar</button>
+    <button class="btn-danger" onclick="reiniciarEntradas()">Reiniciar Entradas</button>
 
 </div>
 
@@ -218,12 +219,12 @@
 <script>
 function formatarLote() {
     let v = campoLote3.value.replace(/\W/g, "");
-    v = v.substring(0, 5); // L + 4 dígitos
+    v = v.substring(0, 5);
 
     if (!v.startsWith("L")) v = "L" + v;
 
-    let bloco1 = v.substring(0,3); // L21
-    let bloco2 = v.substring(3,5); // 15
+    let bloco1 = v.substring(0,3);
+    let bloco2 = v.substring(3,5);
 
     campoLote3.value = bloco1 + "." + bloco2;
 
@@ -232,7 +233,7 @@ function formatarLote() {
 
 function formatarPostura() {
     let v = campoLote10.value.replace(/\D/g, "");
-    v = v.substring(0, 6); // 3 blocos de 2
+    v = v.substring(0, 6);
 
     let formatado = ".";
 
@@ -246,11 +247,11 @@ function formatarPostura() {
 }
 
 function montarLoteCompleto() {
-    let lote = campoLote3.value;      // L21.15
-    let postura = campoLote10.value;  // .19.06.26
+    let lote = campoLote3.value;
+    let postura = campoLote10.value;
 
     if (lote.length === 6 && postura.length === 9) {
-        campoLote.value = lote + postura; // L21.15.19.06.26
+        campoLote.value = lote + postura;
     } else {
         campoLote.value = "";
     }
@@ -259,10 +260,48 @@ function montarLoteCompleto() {
 let indiceEditando = null;
 let ordemAsc = true;
 
-function formatarDataBR(dataISO) {
-    const partes = dataISO.split("-");
-    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+function salvarLocalStorage() {
+    let tbody = document.querySelector("#tabela tbody");
+    let dados = [];
+
+    for (let linha of tbody.rows) {
+        dados.push({
+            data: linha.cells[0].innerText,
+            sku: linha.cells[1].innerText,
+            palete: linha.cells[2].innerText,
+            loteCompleto: linha.cells[3].innerText,
+            lote: linha.cells[4].innerText,
+            postura: linha.cells[5].innerText,
+            caixas: linha.cells[6].innerText
+        });
+    }
+
+    localStorage.setItem("entradas", JSON.stringify(dados));
 }
+
+function carregarLocalStorage() {
+    let dados = JSON.parse(localStorage.getItem("entradas") || "[]");
+    let tbody = document.querySelector("#tabela tbody");
+
+    dados.forEach(item => {
+        let linha = tbody.insertRow();
+        linha.innerHTML = `
+            <td>${item.data}</td>
+            <td>${item.sku}</td>
+            <td>${item.palete}</td>
+            <td>${item.loteCompleto}</td>
+            <td>${item.lote}</td>
+            <td>${item.postura}</td>
+            <td>${item.caixas}</td>
+            <td>
+                <button class="btn-blue" onclick="editarLinha(this)">Editar</button>
+                <button class="btn-danger" onclick="excluirLinha(this)">Excluir</button>
+            </td>
+        `;
+    });
+}
+
+window.onload = carregarLocalStorage;
 
 function limparCampos() {
     campoData.value = "";
@@ -319,6 +358,7 @@ function salvarEntrada() {
         `;
     }
 
+    salvarLocalStorage();
     limparCampos();
 }
 
@@ -342,7 +382,19 @@ function editarLinha(botao) {
 
 function excluirLinha(botao) {
     botao.parentNode.parentNode.remove();
+    salvarLocalStorage();
     indiceEditando = null;
+}
+
+function reiniciarEntradas() {
+    if (!confirm("Tem certeza que deseja apagar todas as entradas?")) return;
+
+    localStorage.removeItem("entradas");
+
+    let tbody = document.querySelector("#tabela tbody");
+    tbody.innerHTML = "";
+
+    alert("Entradas apagadas com sucesso.");
 }
 
 function ordenarTabela(coluna) {
@@ -366,6 +418,11 @@ function ordenarTabela(coluna) {
 
     ordemAsc = !ordemAsc;
     linhas.forEach(l => tbody.appendChild(l));
+}
+
+function formatarDataBR(dataISO) {
+    const partes = dataISO.split("-");
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
 }
 
 async function gerarExcel() {
