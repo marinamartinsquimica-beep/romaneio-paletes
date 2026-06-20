@@ -172,16 +172,16 @@
 
     <div class="input-group">
         <label>Lote (6 dígitos)</label>
-        <input type="text" id="campoLote3" maxlength="6" oninput="montarLoteCompleto()">
+        <input type="text" id="campoLote3" maxlength="6" oninput="formatarPostura()">
     </div>
 
     <div class="input-group">
         <label>Data de Postura (8 dígitos)</label>
-        <input type="text" id="campoLote10" maxlength="8" oninput="montarLoteCompleto()">
+        <input type="text" id="campoLote10" maxlength="9" oninput="formatarPostura()">
     </div>
 
     <div class="input-group">
-        <label>Lote Completo (14 dígitos)</label>
+        <label>Lote Completo</label>
         <input type="text" id="campoLote" disabled>
     </div>
 
@@ -217,15 +217,28 @@
 
 <script>
 
-function montarLoteCompleto() {
-    let lote = campoLote3.value;
-    let postura = campoLote10.value;
+function formatarPostura() {
+    let valor = campoLote10.value.replace(/\D/g, "");
+    valor = valor.substring(0, 8);
+    campoLote10.value = "." + valor;
+    montarLoteCompleto(valor);
+}
 
-    // Lote = 6 dígitos
-    // Postura = 8 dígitos
-    // Lote Completo = 14 dígitos (junção direta)
-    if (lote.length === 6 && postura.length === 8) {
-        campoLote.value = lote + postura;
+function montarLoteCompleto(posturaLimpa) {
+    let lote = campoLote3.value;
+
+    if (lote.length === 6 && posturaLimpa.length === 8) {
+
+        let l1 = lote.substring(0,2);
+        let l2 = lote.substring(2,4);
+        let l3 = lote.substring(4,6);
+
+        let p1 = posturaLimpa.substring(0,2);
+        let p2 = posturaLimpa.substring(2,4);
+        let p3 = posturaLimpa.substring(4,6);
+        let p4 = posturaLimpa.substring(6,8);
+
+        campoLote.value = `${l1}.${l2}.${l3}.${p1}.${p2}.${p3}.${p4}`;
     } else {
         campoLote.value = "";
     }
@@ -258,7 +271,7 @@ function salvarEntrada() {
     let palete = campoPalete.value;
     let loteCompleto = campoLote.value;
     let lote = campoLote3.value;
-    let postura = campoLote10.value;
+    let postura = campoLote10.value.replace(".", "");
     let caixas = campoCaixas.value;
 
     if (!dataISO || !sku || !palete || !loteCompleto || !caixas) {
@@ -310,7 +323,7 @@ function editarLinha(botao) {
 
     campoLote.value = linha.cells[3].innerText;
     campoLote3.value = linha.cells[4].innerText;
-    campoLote10.value = linha.cells[5].innerText;
+    campoLote10.value = "." + linha.cells[5].innerText;
 
     campoCaixas.value = linha.cells[6].innerText;
 }
