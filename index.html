@@ -171,8 +171,8 @@
     </div>
 
     <div class="input-group">
-        <label>Lote (3 dígitos)</label>
-        <input type="text" id="campoLote3" maxlength="3" oninput="montarLoteCompleto()">
+        <label>Lote (6 dígitos)</label>
+        <input type="text" id="campoLote3" maxlength="6" oninput="montarLoteCompleto()">
     </div>
 
     <div class="input-group">
@@ -181,7 +181,7 @@
     </div>
 
     <div class="input-group">
-        <label>Lote Completo</label>
+        <label>Lote Completo (14 dígitos)</label>
         <input type="text" id="campoLote" disabled>
     </div>
 
@@ -221,13 +221,11 @@ function montarLoteCompleto() {
     let lote = campoLote3.value;
     let postura = campoLote10.value;
 
-    if (lote.length === 3 && postura.length === 8) {
-        campoLote.value =
-            lote + "." +
-            postura.substring(0,2) + "." +
-            postura.substring(2,4) + "." +
-            postura.substring(4,6) + "." +
-            postura.substring(6,8);
+    // Lote = 6 dígitos
+    // Postura = 8 dígitos
+    // Lote Completo = 14 dígitos (junção direta)
+    if (lote.length === 6 && postura.length === 8) {
+        campoLote.value = lote + postura;
     } else {
         campoLote.value = "";
     }
@@ -382,3 +380,4 @@ if ("serviceWorker" in navigator) {
 
 </body>
 </html>
+
