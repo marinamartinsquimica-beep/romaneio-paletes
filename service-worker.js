@@ -1,4 +1,4 @@
-const CACHE_NAME = "romaneio-cache-v10";
+const CACHE_NAME = "romaneio-cache-v11";
 
 const FILES_TO_CACHE = [
   "./",
@@ -9,10 +9,14 @@ const FILES_TO_CACHE = [
   "./icon-512.png"
 ];
 
-// Instalação
+// Instalação — força download de arquivos novos
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then(async cache => {
+      await cache.addAll(
+        FILES_TO_CACHE.map(url => new Request(url, { cache: "reload" }))
+      );
+    })
   );
   self.skipWaiting();
 });
